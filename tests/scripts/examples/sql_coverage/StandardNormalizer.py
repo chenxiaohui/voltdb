@@ -277,3 +277,8 @@ class StandardNormalizer:
         sort(table.tuples, indices, desc, sort_nulls)
     
         return table
+
+def safecmp(x, y):
+    """Simply calls StandardNormalizer.safecmp(x, y).
+    """
+    return StandardNormalizer.safecmp(x,y)
