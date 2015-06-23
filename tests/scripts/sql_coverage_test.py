@@ -26,6 +26,7 @@ import sys
 # add the path to the volt python client, just based on knowing
 # where we are now
 sys.path.append('../../lib/python')
+sys.path.append('./examples/sql_coverage/')
 
 import random
 import time
