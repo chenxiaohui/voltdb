@@ -208,7 +208,7 @@
     "temp-test": {"schema": "schema.py",
                   "ddl": "DDL.sql",
                   "template": "temp-test.sql",
-                  "normalizer": "normalizer.py"},
+                  "normalizer": "nulls-lowest-normalizer.py"},
 
 # This suite written to test push-down of aggregates and limits in combination
 # with indexes, projections and order-by.
