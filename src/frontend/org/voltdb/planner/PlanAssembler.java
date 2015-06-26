@@ -224,6 +224,42 @@ public class PlanAssembler {
         return false;
     }
 
+    private boolean partitionColumnAsAggArg(ArrayList<ParsedColInfo> aggResultColumns) {
+        assert(m_parsedSelect != null);
+
+        if (aggResultColumns == null) {
+            return false;
+        }
+
+        for (ParsedColInfo aggResultCol : aggResultColumns) {
+            if ( ! (aggResultCol.expression instanceof AggregateExpression)) {
+                continue;
+            }
+            AbstractExpression aggExpr = aggResultCol.expression.getLeft();
+            if ( ! (aggExpr instanceof TupleValueExpression)) {
+                return false;
+            }
+            TupleValueExpression tve = (TupleValueExpression) aggExpr;
+            StmtTableScan scanTable = m_parsedSelect.m_tableAliasMap.get(tve.getTableAlias());
+            // table alias may be from "VOLT_TEMP_TABLE".
+            if (scanTable == null || scanTable.getPartitioningColumns() == null) {
+                return false;
+            }
+            boolean match = false;
+            for (SchemaColumn pcol : scanTable.getPartitioningColumns()) {
+                if  (pcol != null && pcol.getColumnName().equals(tve.getColumnName()) ) {
+                    match = true;
+                    break;
+                }
+            }
+            if (! match) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Clear any old state and get ready to plan a new plan. The next call to
      * getNextPlan() will return the first candidate plan for these parameters.
@@ -255,6 +291,10 @@ public class PlanAssembler {
             // Process the GROUP BY information, decide whether it is group by the partition column
             if (isPartitionColumnInGroupbyList(m_parsedSelect.m_groupByColumns)) {
                 m_parsedSelect.setHasPartitionColumnInGroupby();
+            }
+
+            if (partitionColumnAsAggArg(m_parsedSelect.m_aggResultColumns)) {
+                m_parsedSelect.setPartitionColumnAsAggArg();
             }
 
             // FIXME: is the following scheme/comment obsolete?
@@ -1959,11 +1999,13 @@ public class PlanAssembler {
                          *
                          * If DISTINCT is specified, don't do push-down for
                          * count() and sum() when not group by partition column.
+                         * An exception is the aggregation arguments are the partition column (ENG-4980).
                          */
                         if (agg_expression_type == ExpressionType.AGGREGATE_COUNT_STAR ||
                             agg_expression_type == ExpressionType.AGGREGATE_COUNT ||
                             agg_expression_type == ExpressionType.AGGREGATE_SUM) {
-                            if (is_distinct && !m_parsedSelect.hasPartitionColumnInGroupby()) {
+                            if ( is_distinct && ! (m_parsedSelect.hasPartitionColumnInGroupby() ||
+                                                   m_parsedSelect.partitionColumnAsAggArg()) ) {
                                 topAggNode = null;
                             }
                             else {
@@ -1993,7 +2035,8 @@ public class PlanAssembler {
                             /*
                              * Input column of the top aggregate node is the output column of the push-down aggregate node
                              */
-                            topAggNode.addAggregate(top_expression_type, is_distinct, outputColumnIndex, tve);
+                            boolean top_distinct = is_distinct && ( ! m_parsedSelect.partitionColumnAsAggArg());
+                            topAggNode.addAggregate(top_expression_type, top_distinct, outputColumnIndex, tve);
                         }
                     }
                 }

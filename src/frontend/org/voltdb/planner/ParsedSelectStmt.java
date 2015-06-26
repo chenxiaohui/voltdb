@@ -87,6 +87,7 @@ public class ParsedSelectStmt extends AbstractParsedStmt {
     private NodeSchema m_avgPushdownFinalProjectSchema;
 
     private boolean m_hasPartitionColumnInGroupby = false;
+    private boolean m_partitionColumnAsAggArg = false;
     private boolean m_hasAggregateDistinct = false;
     private boolean m_hasPartitionColumnInDistinctGroupby = false;
     private boolean m_isComplexOrderBy = false;
@@ -1490,6 +1491,14 @@ public class ParsedSelectStmt extends AbstractParsedStmt {
 
     public void setHasPartitionColumnInGroupby() {
         m_hasPartitionColumnInGroupby = true;
+    }
+
+    public boolean partitionColumnAsAggArg() {
+        return m_partitionColumnAsAggArg;
+    }
+
+    public void setPartitionColumnAsAggArg() {
+        m_partitionColumnAsAggArg = true;
     }
 
     public boolean hasPartitionColumnInDistinctGroupby() {
