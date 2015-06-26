@@ -1688,11 +1688,8 @@ public class VoltCompiler {
                                             " DR does not support materialized view.");
         }
 
-        if (action.equalsIgnoreCase("DISABLE")) {
-            tableref.setIsdred(false);
-        } else {
-            tableref.setIsdred(true);
-        }
+        tableref.setIsdred(!action.equalsIgnoreCase("DISABLE"));
+        tableref.setIsactiveactivedred(action.equalsIgnoreCase("ACTIVE"));
     }
 
     // Usage messages for new and legacy syntax.

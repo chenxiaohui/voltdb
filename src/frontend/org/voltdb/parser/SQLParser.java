@@ -315,9 +315,11 @@ public class SQLParser extends SQLPatternFactory
     private static final Pattern PAT_DR_TABLE = Pattern.compile(
             "(?i)" +                                // (ignore case)
             "\\A"  +                                // start statement
-            "DR\\s+TABLE\\s+" +                     // DR TABLE
-            "([\\w.$|\\\\*]+)" +                    // (1) <table name>
-            "(?:\\s+(DISABLE))?" +                  //     (2) optional DISABLE argument
+            "DR" +                                  // DR
+            "(?:\\s+(ACTIVE))?" +                   // (1) optional ACTIVE argument
+            "\\s+TABLE\\s+" +                       // TABLE
+            "([\\w.$|\\\\*]+)" +                    // (2) <table name>
+            "(?:\\s+(DISABLE))?" +                  // (3) optional DISABLE argument
             "\\s*;\\z"                              // (end statement)
             );
 

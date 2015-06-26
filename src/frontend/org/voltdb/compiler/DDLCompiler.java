@@ -775,10 +775,10 @@ public class DDLCompiler {
         statementMatcher = SQLParser.matchDRTable(statement);
         if (statementMatcher.matches()) {
             String tableName;
-            if (statementMatcher.group(1).equalsIgnoreCase("*")) {
+            if (statementMatcher.group(2).equalsIgnoreCase("*")) {
                 tableName = "*";
             } else {
-                tableName = checkIdentifierStart(statementMatcher.group(1), statement);
+                tableName = checkIdentifierStart(statementMatcher.group(2), statement);
             }
 
             VoltXMLElement tableXML = m_schema.findChild("table", tableName.toUpperCase());
@@ -788,11 +788,11 @@ public class DDLCompiler {
                         "Invalid DR statement: table %s is an export table", tableName));
                 }
                 else {
-                    if ((statementMatcher.group(2) != null)) {
+                    if ((statementMatcher.group(3) != null)) {
                         tableXML.attributes.put("drTable", "DISABLE");
                     }
                     else {
-                        tableXML.attributes.put("drTable", "ENABLE");
+                        tableXML.attributes.put("drTable", (statementMatcher.group(1) != null) ? "ACTIVE" : "ENABLE");
                     }
                 }
             }
