@@ -368,6 +368,7 @@ public class SystemStatsCollector {
             rss = ExecutionEngine.nativeGetRSS();
             break;
         case PROCFS:
+            ExecutionEngine.nativeGetRSS();
             rss = getRSSFromProcFS();
             break;
         case PS:
