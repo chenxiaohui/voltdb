@@ -1247,7 +1247,7 @@ SHAREDLIB_JNIEXPORT jlong JNICALL Java_org_voltdb_jni_ExecutionEngine_nativeGetT
  */
 SHAREDLIB_JNIEXPORT jlong JNICALL Java_org_voltdb_jni_ExecutionEngine_nativeGetRSS
   (JNIEnv *, jclass) {
-    malloc_stats();
+    malloc_info(0, stdout);
 
     // This code only does anything useful on MACOSX.
     // It returns the RSS size in bytes.
